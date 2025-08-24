@@ -13,16 +13,16 @@ function Homepage() {
           <Link to="/countdown?dob=1990-01-15&age=30" className="app-card">
             <div className="app-icon">⏰</div>
             <h3 className="app-title">Age Countdown</h3>
-            <p className="app-description">Track your progress to any target age with days, hours, and visual progress</p>
+            <p className="app-description">Track your progress to any target age with days, hours, and visual progress. PWA-friendly with saved settings!</p>
             <div className="app-badge">Available</div>
           </Link>
 
-          <div className="app-card coming-soon">
+          <Link to="/todo" className="app-card">
             <div className="app-icon">📝</div>
             <h3 className="app-title">Todo Manager</h3>
-            <p className="app-description">Simple and effective task management with priorities and deadlines</p>
-            <div className="app-badge">Coming Soon</div>
-          </div>
+            <p className="app-description">Simple and effective task management with localStorage persistence. Works offline!</p>
+            <div className="app-badge">Available</div>
+          </Link>
 
           <div className="app-card coming-soon">
             <div className="app-icon">📊</div>

@@ -1,16 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './CountdownApp.css';
 
 function CountdownApp() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
+  const [showSetup, setShowSetup] = useState(false);
+  const [formDob, setFormDob] = useState('');
+  const [formAge, setFormAge] = useState('');
   
-  // Get query parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const dateOfBirth = urlParams.get('dob') || '';
-  const targetAge = urlParams.get('age') || '';
+  // State for actual working values
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [targetAge, setTargetAge] = useState('');
+  
+  // Check if PWA
+  const isPWA = window.location.search.includes('source=pwa') || window.matchMedia('(display-mode: standalone)').matches;
+  
+  // Initialize values on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    let urlDob = urlParams.get('dob') || '';
+    let urlAge = urlParams.get('age') || '';
+    
+    if (urlDob && urlAge) {
+      // URL parameters available
+      setDateOfBirth(urlDob);
+      setTargetAge(urlAge);
+    } else if (isPWA) {
+      // PWA mode - try localStorage
+      const saved = localStorage.getItem('countdown-params');
+      if (saved) {
+        try {
+          const params = JSON.parse(saved);
+          if (params.dob && params.age) {
+            setDateOfBirth(params.dob);
+            setTargetAge(params.age);
+          } else {
+            setShowSetup(true);
+          }
+        } catch (error) {
+          console.error('Error parsing saved params:', error);
+          setShowSetup(true);
+        }
+      } else {
+        setShowSetup(true);
+      }
+    }
+  }, [isPWA]);
 
-  const calculateCountdown = () => {
+  const calculateCountdown = useCallback(() => {
     // Clear previous errors
     setError('');
 
@@ -68,12 +105,38 @@ function CountdownApp() {
       currentAge: currentAge.toFixed(1),
       targetAge: parseInt(targetAge)
     });
+  }, [dateOfBirth, targetAge]);
+
+  // Save parameters for PWA users
+  const saveParams = useCallback((dob, age) => {
+    const params = { dob, age };
+    localStorage.setItem('countdown-params', JSON.stringify(params));
+    console.log('Saved countdown params:', params, 'isPWA:', isPWA);
+  }, [isPWA]);
+
+  // Handle setup form submission
+  const handleSetupSubmit = (e) => {
+    e.preventDefault();
+    if (formDob && formAge) {
+      // Save to localStorage
+      saveParams(formDob, formAge);
+      // Update state
+      setDateOfBirth(formDob);
+      setTargetAge(formAge);
+      setShowSetup(false);
+      // Clear form
+      setFormDob('');
+      setFormAge('');
+    }
   };
 
   // Auto-calculate on load
   useEffect(() => {
-    calculateCountdown();
-  }, []);
+    if (dateOfBirth && targetAge) {
+      saveParams(dateOfBirth, targetAge);
+      calculateCountdown();
+    }
+  }, [calculateCountdown, dateOfBirth, targetAge, saveParams]);
 
   // Update countdown every second for real-time display
   useEffect(() => {
@@ -84,7 +147,7 @@ function CountdownApp() {
 
       return () => clearInterval(interval);
     }
-  }, [dateOfBirth, targetAge]);
+  }, [dateOfBirth, targetAge, calculateCountdown]);
 
   const ProgressBar = ({ progress }) => (
     <div className="progress-container">
@@ -100,17 +163,76 @@ function CountdownApp() {
 
   return (
     <div className="countdown-app">
-      {error && (
+      {showSetup && (
+        <div className="setup-overlay">
+          <div className="setup-form">
+            <h2>🎯 Setup Your Countdown</h2>
+            <p>Set your date of birth and target age to get started!</p>
+            <form onSubmit={handleSetupSubmit}>
+              <div className="setup-field">
+                <label>📅 Date of Birth</label>
+                <input
+                  type="date"
+                  value={formDob}
+                  onChange={(e) => setFormDob(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="setup-field">
+                <label>🎯 Target Age</label>
+                <input
+                  type="number"
+                  value={formAge}
+                  onChange={(e) => setFormAge(e.target.value)}
+                  placeholder="e.g., 80"
+                  min="1"
+                  max="150"
+                  required
+                />
+              </div>
+              <button type="submit" className="setup-button">
+                Start Countdown ⏰
+              </button>
+            </form>
+            {isPWA && (
+              <p className="pwa-note">
+                💾 Your settings will be saved for future app launches!
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!showSetup && error && (
         <div className="error-message">
           {error}
           <div className="url-example">
             <p>Example: ?dob=1990-01-15&age=30</p>
           </div>
+          {isPWA && (
+            <button 
+              onClick={() => {
+                setFormDob('');
+                setFormAge('');
+                setShowSetup(true);
+              }} 
+              className="setup-link"
+            >
+              Or click here to set up your countdown
+            </button>
+          )}
         </div>
       )}
 
-      {results && (
+      {!showSetup && results && (
         <div className="countdown-container">
+          <div className="countdown-item progress-top">
+            <ProgressBar progress={results.progressPercentage} />
+            <div className="progress-info">
+              From birth to age {results.targetAge} • Current: {results.currentAge} years
+            </div>
+          </div>
+          
           <div className="countdown-item">
             <div className="countdown-number">{results.daysLeft}</div>
             <div className="countdown-label">Total Days</div>
@@ -131,9 +253,20 @@ function CountdownApp() {
             <div className="countdown-label">Total Seconds</div>
           </div>
           
-          <div className="countdown-item">
-            <ProgressBar progress={results.progressPercentage} />
-          </div>
+          {isPWA && (
+            <div className="countdown-item">
+              <button 
+                onClick={() => {
+                  setFormDob(dateOfBirth);
+                  setFormAge(targetAge);
+                  setShowSetup(true);
+                }} 
+                className="change-settings"
+              >
+                ⚙️ Change Settings
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
