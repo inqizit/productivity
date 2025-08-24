@@ -1,23 +1,25 @@
 {
   "name": "productivity",
   "version": "0.1.0",
-  "homepage": "https://yourusername.github.io/productivity",
+  "homepage": "https://inqizit.github.io/productivity",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "@xenova/transformers": "^2.17.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^6.30.1",
+    "react-router-dom": "^6.8.0",
     "react-scripts": "5.0.1",
+    "sql.js": "^1.13.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -41,6 +43,20 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.7",
+    "@types/sql.js": "^1.4.9",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "customize-cra": "^1.0.0",
+    "gh-pages": "^6.3.0",
+    "path-browserify": "^1.0.1",
+    "react-app-rewired": "^2.2.1",
+    "stream-browserify": "^3.0.0",
+    "typescript": "^5.9.2",
+    "url": "^0.11.4",
+    "vm-browserify": "^1.1.2"
   }
 }

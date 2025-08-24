@@ -11,6 +11,34 @@
   width: 100%;
 }
 
+.homepage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+}
+
+.storage-settings-button {
+  padding: 0.8rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.storage-settings-button:hover {
+  background: #5a6fd8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
 .homepage-title {
   font-size: 3rem;
   text-align: center;
@@ -24,7 +52,7 @@
   font-size: 1.2rem;
   text-align: center;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 3rem;
+  margin-bottom: 0;
   font-weight: 300;
 }
 
