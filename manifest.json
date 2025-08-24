@@ -1,7 +1,7 @@
 {
-  "short_name": "Age Countdown",
-  "name": "Age Countdown - Track Your Life Progress",
-  "description": "Track your progress to any age with days, hours, and a visual progress bar",
+  "short_name": "Productivity",
+  "name": "Productivity Suite - Useful Apps Collection",
+  "description": "Collection of productivity apps including age countdown, todo manager, habit tracker and more",
   "icons": [
     {
       "src": "favicon.ico",
@@ -19,10 +19,13 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/?source=pwa",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#667eea",
   "background_color": "#667eea",
-  "categories": ["lifestyle", "utilities"]
+  "categories": ["lifestyle", "utilities", "productivity"],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
