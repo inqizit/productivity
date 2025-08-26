@@ -41,7 +41,19 @@ const StorageSettings: React.FC<StorageSettingsProps> = ({ isOpen, onClose }) =>
     }
   };
 
+  // Detect mobile device
+  const isMobile = (): boolean => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           window.innerWidth <= 768;
+  };
+
   const handleSelectDirectory = async (): Promise<void> => {
+    // On mobile, show helpful message instead of trying file system
+    if (isMobile()) {
+      setError('📱 File storage is not available on mobile devices. Your data is automatically saved to browser storage and syncs across PWA sessions. For advanced file storage, use this app on desktop Chrome, Edge, or Safari.');
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError('');
@@ -56,7 +68,7 @@ const StorageSettings: React.FC<StorageSettingsProps> = ({ isOpen, onClose }) =>
     } catch (error: any) {
       console.error('Directory selection failed:', error);
       if (error.message.includes('not supported')) {
-        setError('❌ File System Access not supported in this browser. Try Chrome, Edge, or Safari.');
+        setError('❌ File System Access not supported in this browser. Use desktop Chrome, Edge, or Safari for file storage. Your data is safely stored in browser storage.');
       } else if (error.name === 'AbortError') {
         // User cancelled, not an error
         setError('');
@@ -159,30 +171,45 @@ const StorageSettings: React.FC<StorageSettingsProps> = ({ isOpen, onClose }) =>
           <div className="storage-info-section">
             <h3>📊 Current Storage</h3>
             {storageInfo && (
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="info-label">Type:</span>
-                  <span className="info-value">
-                    {storageInfo.type === 'fileSystem' ? '📁 File System' : 
-                     storageInfo.type === 'localStorage' ? '🌐 Browser Storage' : 
-                     '💾 IndexedDB'}
-                  </span>
+              <>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="info-label">Type:</span>
+                    <span className="info-value">
+                      {storageInfo.type === 'fileSystem' ? '📁 File System' : 
+                       storageInfo.type === 'localStorage' ? '🌐 Browser Storage' : 
+                       '💾 IndexedDB'}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Location:</span>
+                    <span className="info-value">{storageInfo.location}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Size:</span>
+                    <span className="info-value">{storageInfo.size}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Status:</span>
+                    <span className={`info-value ${storageInfo.available ? 'available' : 'unavailable'}`}>
+                      {storageInfo.available ? '✅ Available' : '❌ Unavailable'}
+                    </span>
+                  </div>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Location:</span>
-                  <span className="info-value">{storageInfo.location}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Size:</span>
-                  <span className="info-value">{storageInfo.size}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Status:</span>
-                  <span className={`info-value ${storageInfo.available ? 'available' : 'unavailable'}`}>
-                    {storageInfo.available ? '✅ Available' : '❌ Unavailable'}
-                  </span>
-                </div>
-              </div>
+                
+                {/* Mobile-specific info */}
+                {isMobile() && storageInfo.type === 'localStorage' && (
+                  <div className="mobile-storage-info">
+                    <div className="mobile-badge">📱 Mobile Optimized</div>
+                    <p>
+                      <strong>✅ Your data is being saved!</strong><br/>
+                      On mobile devices, your data is stored in secure browser storage and automatically 
+                      syncs when you use the PWA. Your countdown settings, todos, and other data persist 
+                      across app sessions.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

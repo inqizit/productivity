@@ -350,57 +350,77 @@ const CountdownApp: React.FC = () => {
             </div>
           </div>
           
-          <div className="countdown-item">
-            <div className="countdown-number">{results.daysLeft}</div>
-            <div className="countdown-label">Total Days</div>
-          </div>
-          
-          <div className="countdown-item">
-            <div className="countdown-number">{results.hoursLeft}</div>
-            <div className="countdown-label">Total Hours</div>
-            {showRealisticTime && results.productiveHoursLeft && (
-              <div className="realistic-time-display">
-                <div className="realistic-number">{results.productiveHoursLeft}</div>
-                <div className="realistic-label">Productive Hours</div>
+          <div className="countdown-item days-highlight">
+            <div className="countdown-content">
+              <div className="main-metric">
+                <div className="countdown-number">{results.daysLeft}</div>
+                <div className="countdown-label">Total Days</div>
               </div>
-            )}
+            </div>
           </div>
           
           <div className="countdown-item">
-            <div className="countdown-number">{results.minutesLeft}</div>
-            <div className="countdown-label">Total Minutes</div>
-            {showRealisticTime && results.productiveMinutesLeft && (
-              <div className="realistic-time-display">
-                <div className="realistic-number">{results.productiveMinutesLeft}</div>
-                <div className="realistic-label">Productive Minutes</div>
+            <div className="countdown-content">
+              <div className="main-metric">
+                <div className="countdown-number">{results.hoursLeft}</div>
+                <div className="countdown-label">Total Hours</div>
               </div>
-            )}
-          </div>
-          
-          <div className="countdown-item">
-            <div className="countdown-number">{results.secondsLeft}</div>
-            <div className="countdown-label">Total Seconds</div>
-            {showRealisticTime && results.productiveSecondsLeft && (
-              <div className="realistic-time-display">
-                <div className="realistic-number">{results.productiveSecondsLeft}</div>
-                <div className="realistic-label">Productive Seconds</div>
-              </div>
-            )}
-          </div>
-          
-          <div className="countdown-item">
-            <button 
-              onClick={handleChangeSettings}
-              className="change-settings"
-            >
-              ⚙️ Change Settings
-            </button>
-            <div className="settings-info">
-              <p>📅 {new Date(dateOfBirth).toLocaleDateString()}</p>
-              <p>🎯 Target: {targetAge} years old</p>
-              {showRealisticTime && (
-                <p>⏱️ Realistic Time: {24 - dailyUnavailableHours}h available/day</p>
+              {showRealisticTime && results.productiveHoursLeft && (
+                <div className="secondary-metric">
+                  <div className="realistic-number">{results.productiveHoursLeft}</div>
+                  <div className="realistic-label">Productive Hours</div>
+                </div>
               )}
+            </div>
+          </div>
+          
+          <div className="countdown-item">
+            <div className="countdown-content">
+              <div className="main-metric">
+                <div className="countdown-number">{results.minutesLeft}</div>
+                <div className="countdown-label">Total Minutes</div>
+              </div>
+              {showRealisticTime && results.productiveMinutesLeft && (
+                <div className="secondary-metric">
+                  <div className="realistic-number">{results.productiveMinutesLeft}</div>
+                  <div className="realistic-label">Productive Minutes</div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="countdown-item">
+            <div className="countdown-content">
+              <div className="main-metric">
+                <div className="countdown-number">{results.secondsLeft}</div>
+                <div className="countdown-label">Total Seconds</div>
+              </div>
+              {showRealisticTime && results.productiveSecondsLeft && (
+                <div className="secondary-metric">
+                  <div className="realistic-number">{results.productiveSecondsLeft}</div>
+                  <div className="realistic-label">Productive Seconds</div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="countdown-item settings-card">
+            <div className="countdown-content settings-content">
+              <div className="settings-actions">
+                <button 
+                  onClick={handleChangeSettings}
+                  className="change-settings"
+                >
+                  ⚙️ Change Settings
+                </button>
+              </div>
+              <div className="settings-info">
+                <p>📅 {new Date(dateOfBirth).toLocaleDateString()}</p>
+                <p>🎯 Target: {targetAge} years old</p>
+                {showRealisticTime && (
+                  <p>⏱️ Realistic Time: {24 - dailyUnavailableHours}h available/day</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

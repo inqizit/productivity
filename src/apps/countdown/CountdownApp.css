@@ -11,18 +11,112 @@
 .countdown-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  max-width: 400px;
+  gap: 1.5rem;
+  max-width: 600px;
   width: 100%;
+}
+
+/* Days highlight - most important metric */
+.days-highlight {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #be185d 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4), 0 3px 10px rgba(0, 0, 0, 0.2);
+  transform: scale(1.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.days-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.days-highlight .countdown-number {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+  letter-spacing: -1px;
+  position: relative;
+  z-index: 1;
+}
+
+.days-highlight .countdown-label {
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure all content is above the overlay */
+.days-highlight .countdown-content,
+.days-highlight .main-metric {
+  position: relative;
+  z-index: 1;
+}
+
+/* Settings card styling */
+.settings-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.settings-card .change-settings {
+  margin: 0;
+  align-self: center;
 }
 
 .countdown-item {
   background: white;
   border-radius: 12px;
   padding: 2.5rem 2rem;
-  text-align: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   border: 1px solid #e9ecef;
+}
+
+/* Countdown content wrapper for horizontal layout */
+.countdown-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+/* Single metric or main metric */
+.main-metric {
+  flex: 1;
+  text-align: center;
+}
+
+/* Secondary metric (realistic time) */
+.secondary-metric {
+  flex: 0 0 auto;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Settings content layout */
+.settings-content {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: center;
 }
 
 .countdown-number {
@@ -127,10 +221,22 @@
   
   .countdown-container {
     gap: 1.5rem;
+    max-width: 100%;
   }
   
   .countdown-item {
     padding: 1.5rem 1rem;
+  }
+
+  /* Stack metrics vertically on mobile */
+  .countdown-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .secondary-metric {
+    min-width: auto;
+    width: 100%;
   }
   
   .countdown-number {
@@ -152,17 +258,29 @@
   .progress-info {
     font-size: 0.8rem;
   }
+
+  /* Adjust days highlight for mobile */
+  .days-highlight {
+    transform: scale(1);
+  }
 }
 
 /* Ultra-clean minimal variant */
 @media (max-width: 480px) {
   .countdown-container {
     gap: 1rem;
+    max-width: 100%;
   }
   
   .countdown-item {
     padding: 1.2rem 0.8rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Ensure content stacks vertically */
+  .countdown-content {
+    flex-direction: column;
+    gap: 0.8rem;
   }
   
   .countdown-number {
@@ -177,7 +295,17 @@
   .progress-text {
     font-size: 1rem;
   }
-  
+
+  /* Compact settings card for mobile */
+  .settings-card {
+    padding: 1rem;
+  }
+
+  .settings-card .settings-info p {
+    font-size: 0.75rem;
+    margin: 0.2rem 0;
+  }
+
   .progress-top .progress-text {
     font-size: 1.2rem;
   }

@@ -513,3 +513,35 @@
     justify-content: center;
   }
 }
+
+/* Mobile storage info */
+.mobile-storage-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%);
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.mobile-badge {
+  display: inline-block;
+  background: #28a745;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.mobile-storage-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #2c3e50;
+}
+
+.mobile-storage-info strong {
+  color: #28a745;
+}
