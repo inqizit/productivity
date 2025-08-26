@@ -9,11 +9,17 @@ interface CountdownResults {
   progressPercentage: number;
   currentAge: string;
   targetAge: number;
+  // Realistic/productive time
+  productiveHoursLeft?: string;
+  productiveMinutesLeft?: string;
+  productiveSecondsLeft?: string;
 }
 
 interface CountdownSettings {
   dob: string;
   age: string;
+  showRealisticTime?: boolean;
+  dailyUnavailableHours?: number;
 }
 
 interface ProgressBarProps {
@@ -26,9 +32,15 @@ const CountdownApp: React.FC = () => {
   const [showSetup, setShowSetup] = useState<boolean>(false);
   const [formDob, setFormDob] = useState<string>('');
   const [formAge, setFormAge] = useState<string>('');
+  const [formShowRealisticTime, setFormShowRealisticTime] = useState<boolean>(false);
+  const [formDailyUnavailableHours, setFormDailyUnavailableHours] = useState<number>(15);
   const [dateOfBirth, setDateOfBirth] = useState<string>('');
   const [targetAge, setTargetAge] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // Realistic time settings
+  const [showRealisticTime, setShowRealisticTime] = useState<boolean>(false);
+  const [dailyUnavailableHours, setDailyUnavailableHours] = useState<number>(15); // Default 15 hours
 
   // Storage key
   const STORAGE_KEY = 'countdown-settings';
@@ -43,6 +55,13 @@ const CountdownApp: React.FC = () => {
           if (settings.dob && settings.age) {
             setDateOfBirth(settings.dob);
             setTargetAge(settings.age);
+            // Load realistic time settings
+            if (settings.showRealisticTime !== undefined) {
+              setShowRealisticTime(settings.showRealisticTime);
+            }
+            if (settings.dailyUnavailableHours !== undefined) {
+              setDailyUnavailableHours(settings.dailyUnavailableHours);
+            }
             setIsLoading(false);
             return;
           }
@@ -109,6 +128,21 @@ const CountdownApp: React.FC = () => {
     const timePassed = now.getTime() - birth.getTime();
     const progressPercentage = (timePassed / totalTime) * 100;
 
+    // Calculate productive/realistic time
+    let productiveResults: Partial<CountdownResults> = {};
+    if (showRealisticTime) {
+      const availableHoursPerDay = 24 - dailyUnavailableHours;
+      const productiveTotalHours = totalDaysLeft * availableHoursPerDay;
+      const productiveTotalMinutes = productiveTotalHours * 60;
+      const productiveTotalSeconds = productiveTotalMinutes * 60;
+
+      productiveResults = {
+        productiveHoursLeft: Math.floor(productiveTotalHours).toLocaleString(),
+        productiveMinutesLeft: Math.floor(productiveTotalMinutes).toLocaleString(),
+        productiveSecondsLeft: Math.floor(productiveTotalSeconds).toLocaleString(),
+      };
+    }
+
     setResults({
       daysLeft: totalDaysLeft.toLocaleString(),
       hoursLeft: totalHoursLeft.toLocaleString(),
@@ -116,34 +150,42 @@ const CountdownApp: React.FC = () => {
       secondsLeft: totalSecondsLeft.toLocaleString(),
       progressPercentage: Math.min(progressPercentage, 100),
       currentAge: currentAge.toFixed(1),
-      targetAge: parseInt(targetAge)
+      targetAge: parseInt(targetAge),
+      ...productiveResults
     });
-  }, [dateOfBirth, targetAge]);
+  }, [dateOfBirth, targetAge, showRealisticTime, dailyUnavailableHours]);
 
   // Save settings to localStorage
   const saveSettings = useCallback((dob: string, age: string): void => {
     try {
-      const settings: CountdownSettings = { dob, age };
+      const settings: CountdownSettings = { 
+        dob, 
+        age,
+        showRealisticTime,
+        dailyUnavailableHours
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
       console.log('Saved countdown settings:', settings);
     } catch (error) {
       console.error('Error saving settings:', error);
     }
-  }, [STORAGE_KEY]);
+  }, [STORAGE_KEY, showRealisticTime, dailyUnavailableHours]);
 
   // Handle setup form submission
   const handleSetupSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (formDob && formAge) {
-      // Save to localStorage
-      saveSettings(formDob, formAge);
       // Update state
       setDateOfBirth(formDob);
       setTargetAge(formAge);
+      setShowRealisticTime(formShowRealisticTime);
+      setDailyUnavailableHours(formDailyUnavailableHours);
       setShowSetup(false);
       // Clear form
       setFormDob('');
       setFormAge('');
+      setFormShowRealisticTime(false);
+      setFormDailyUnavailableHours(15);
     }
   };
 
@@ -151,8 +193,17 @@ const CountdownApp: React.FC = () => {
   const handleChangeSettings = (): void => {
     setFormDob(dateOfBirth);
     setFormAge(targetAge);
+    setFormShowRealisticTime(showRealisticTime);
+    setFormDailyUnavailableHours(dailyUnavailableHours);
     setShowSetup(true);
   };
+
+  // Auto-save settings when they change
+  useEffect(() => {
+    if (dateOfBirth && targetAge) {
+      saveSettings(dateOfBirth, targetAge);
+    }
+  }, [dateOfBirth, targetAge, showRealisticTime, dailyUnavailableHours, saveSettings]);
 
   // Auto-calculate when settings are loaded
   useEffect(() => {
@@ -224,6 +275,44 @@ const CountdownApp: React.FC = () => {
                   required
                 />
               </div>
+
+              <div className="setup-field realistic-time-section">
+                <div className="realistic-time-header">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formShowRealisticTime}
+                      onChange={(e) => setFormShowRealisticTime(e.target.checked)}
+                    />
+                    <span className="checkbox-text">⏱️ Show Realistic Time</span>
+                  </label>
+                  <span className="feature-description">Shows productive hours after subtracting sleep, chores, etc.</span>
+                </div>
+                
+                {formShowRealisticTime && (
+                  <div className="realistic-time-config">
+                    <label>Daily Unavailable Hours</label>
+                    <div className="hours-input-group">
+                      <input
+                        type="number"
+                        value={formDailyUnavailableHours}
+                        onChange={(e) => setFormDailyUnavailableHours(Number(e.target.value))}
+                        min="8"
+                        max="20"
+                        step="0.5"
+                      />
+                      <span className="hours-unit">hours/day</span>
+                    </div>
+                    <div className="time-breakdown">
+                      <p>🛏️ Sleep: ~8h • 🍽️ Eating: ~2h • 🚿 Hygiene: ~1h</p>
+                      <p>🚗 Commute: ~1.5h • 🧹 Chores: ~1.5h • 🚽 Basic: ~1h</p>
+                      <p className="available-time">
+                        ✨ Available: <strong>{24 - formDailyUnavailableHours} hours/day</strong>
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
               <button type="submit" className="setup-button">
                 {dateOfBirth && targetAge ? 'Update Settings ⚙️' : 'Start Countdown ⏰'}
               </button>
@@ -269,16 +358,34 @@ const CountdownApp: React.FC = () => {
           <div className="countdown-item">
             <div className="countdown-number">{results.hoursLeft}</div>
             <div className="countdown-label">Total Hours</div>
+            {showRealisticTime && results.productiveHoursLeft && (
+              <div className="realistic-time-display">
+                <div className="realistic-number">{results.productiveHoursLeft}</div>
+                <div className="realistic-label">Productive Hours</div>
+              </div>
+            )}
           </div>
           
           <div className="countdown-item">
             <div className="countdown-number">{results.minutesLeft}</div>
             <div className="countdown-label">Total Minutes</div>
+            {showRealisticTime && results.productiveMinutesLeft && (
+              <div className="realistic-time-display">
+                <div className="realistic-number">{results.productiveMinutesLeft}</div>
+                <div className="realistic-label">Productive Minutes</div>
+              </div>
+            )}
           </div>
           
           <div className="countdown-item">
             <div className="countdown-number">{results.secondsLeft}</div>
             <div className="countdown-label">Total Seconds</div>
+            {showRealisticTime && results.productiveSecondsLeft && (
+              <div className="realistic-time-display">
+                <div className="realistic-number">{results.productiveSecondsLeft}</div>
+                <div className="realistic-label">Productive Seconds</div>
+              </div>
+            )}
           </div>
           
           <div className="countdown-item">
@@ -291,6 +398,9 @@ const CountdownApp: React.FC = () => {
             <div className="settings-info">
               <p>📅 {new Date(dateOfBirth).toLocaleDateString()}</p>
               <p>🎯 Target: {targetAge} years old</p>
+              {showRealisticTime && (
+                <p>⏱️ Realistic Time: {24 - dailyUnavailableHours}h available/day</p>
+              )}
             </div>
           </div>
         </div>
