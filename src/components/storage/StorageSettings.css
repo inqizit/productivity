@@ -545,3 +545,69 @@
 .mobile-storage-info strong {
   color: #28a745;
 }
+
+/* IndexedDB storage info */
+.indexeddb-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e6f3ff 0%, #f0f9ff 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.storage-badge {
+  display: inline-block;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.indexeddb-badge {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.indexeddb-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #2c3e50;
+}
+
+.indexeddb-info strong {
+  color: #3b82f6;
+}
+
+/* Quota visual bar */
+.quota-visual {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
+}
+
+.quota-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.quota-used {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.quota-text {
+  font-size: 0.8rem;
+  color: #374151;
+  text-align: center;
+  font-weight: 500;
+}

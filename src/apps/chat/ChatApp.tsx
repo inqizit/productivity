@@ -14,28 +14,28 @@ interface ModelInfo {
 
 const AVAILABLE_MODELS: ModelInfo[] = [
   {
-    id: 'gpt2',
-    name: 'GPT-2 Small',
-    size: '~500MB',
-    description: 'Fast, good for basic conversations',
+    id: 'test',
+    name: 'Test Mode',
+    size: '~0MB',
+    description: 'Echo responses for testing (no AI model)',
     type: 'text-generation' as PipelineType,
-    modelId: 'Xenova/gpt2'
+    modelId: 'test-mode'
   },
   {
     id: 'distilgpt2',
-    name: 'DistilGPT-2',
-    size: '~320MB',
-    description: 'Smaller, faster version of GPT-2',
+    name: 'DistilGPT-2 Tiny',
+    size: '~50MB',
+    description: 'Ultra-light model, fast responses',
     type: 'text-generation' as PipelineType,
     modelId: 'Xenova/distilgpt2'
   },
   {
-    id: 'gpt2-medium',
-    name: 'GPT-2 Medium',
-    size: '~1.5GB',
-    description: 'Better quality, slower generation',
+    id: 'gpt2-tiny',
+    name: 'GPT-2 Nano', 
+    size: '~80MB',
+    description: 'Small but capable text generation',
     type: 'text-generation' as PipelineType,
-    modelId: 'Xenova/gpt2-medium'
+    modelId: 'Xenova/gpt2'
   }
 ];
 
@@ -47,7 +47,7 @@ const ChatApp: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [chatState, setChatState] = useState<ChatState>('idle');
-  const [selectedModel, setSelectedModel] = useState<ModelInfo>(AVAILABLE_MODELS[1]); // DistilGPT-2 as default
+  const [selectedModel, setSelectedModel] = useState<ModelInfo>(AVAILABLE_MODELS[0]); // Test mode as default
   const [loadedModel, setLoadedModel] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
   const [showModelSelector, setShowModelSelector] = useState(false);
@@ -150,27 +150,45 @@ const ChatApp: React.FC = () => {
         pipelineRef.current = null;
       }
 
+      // Handle test mode
+      if (model.id === 'test') {
+        pipelineRef.current = 'test-mode';
+        setLoadedModel(model.id);
+        setChatState('idle');
+        setModelProgress({ progress: 100, message: `${model.name} ready!` });
+        console.log(`✅ Test mode activated`);
+        return;
+      }
+
       // Create abort controller for this loading session
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 
-      // Load the model with progress tracking
-      const modelPipeline = await pipeline(model.type, model.modelId, {
-        progress_callback: (progress: any) => {
-          if (progress.status === 'downloading') {
-            const percent = Math.round((progress.loaded / progress.total) * 100);
-            setModelProgress({
-              progress: percent,
-              message: `Downloading ${model.name}: ${percent}%`
-            });
-          } else if (progress.status === 'loading') {
-            setModelProgress({
-              progress: 100,
-              message: `Loading ${model.name} into memory...`
-            });
-          }
-        }
-      });
+      // Load the model with progress tracking and timeout
+      const modelPipeline = await Promise.race([
+        pipeline(model.type, model.modelId, {
+          progress_callback: (progress: any) => {
+            if (progress.status === 'downloading') {
+              const percent = Math.round((progress.loaded / progress.total) * 100);
+              setModelProgress({
+                progress: percent,
+                message: `Downloading ${model.name}: ${percent}%`
+              });
+            } else if (progress.status === 'loading') {
+              setModelProgress({
+                progress: 100,
+                message: `Loading ${model.name} into memory...`
+              });
+            }
+          },
+          device: 'auto',
+          quantized: true,
+          revision: 'main'
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000)
+        )
+      ]);
 
       // Check if loading was aborted
       if (abortController.signal.aborted) {

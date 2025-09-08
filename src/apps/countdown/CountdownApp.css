@@ -18,10 +18,10 @@
 
 /* Days highlight - most important metric */
 .days-highlight {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #be185d 100%);
-  color: white;
-  border: none;
-  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4), 0 3px 10px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+  color: #1a202c;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3), 0 3px 10px rgba(0, 0, 0, 0.1);
   transform: scale(1.02);
   position: relative;
   overflow: hidden;
@@ -34,23 +34,23 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, transparent 50%, rgba(59, 130, 246, 0.02) 100%);
   pointer-events: none;
 }
 
 .days-highlight .countdown-number {
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.6);
-  font-weight: 400;
+  color: #1a202c;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
   letter-spacing: -1px;
   position: relative;
   z-index: 1;
 }
 
 .days-highlight .countdown-label {
-  color: #ffffff;
-  font-weight: 700;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #2d3748;
+  font-weight: 600;
+  text-shadow: none;
   text-transform: uppercase;
   letter-spacing: 2px;
   position: relative;
@@ -121,17 +121,18 @@
 
 .countdown-number {
   font-size: 3.5rem;
-  font-weight: 300;
-  color: #2c3e50;
+  font-weight: 600;
+  color: #1a202c;
   margin-bottom: 0.5rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   line-height: 1.1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .countdown-label {
   font-size: 1.1rem;
-  color: #6c757d;
-  font-weight: 500;
+  color: #2d3748;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -563,20 +564,21 @@
 
 .realistic-number {
   font-size: 1.8rem;
-  font-weight: 600;
-  color: #667eea;
+  font-weight: 700;
+  color: #4c51bf;
   text-align: center;
   margin-bottom: 0.2rem;
   font-family: 'Courier New', monospace;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .realistic-label {
   font-size: 0.75rem;
-  color: #6c757d;
+  color: #2d3748;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* PWA Controls */

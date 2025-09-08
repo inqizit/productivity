@@ -1,4 +1,5 @@
 import initSqlJs from 'sql.js';
+import { indexedDBManager, StorageQuota } from './IndexedDBManager';
 
 // File System Access API types
 interface FileSystemDirectoryHandle {
@@ -43,7 +44,7 @@ interface StorageConfig {
 }
 
 // Storage types
-export type StorageType = 'localStorage' | 'fileSystem' | 'indexedDB';
+export type StorageType = 'indexedDB' | 'localStorage' | 'fileSystem';
 
 export class StorageManager {
   private static instance: StorageManager;
@@ -83,32 +84,68 @@ export class StorageManager {
     if (this.initialized) return;
 
     try {
-      // Try to initialize SQL.js
-      this.sql = await initSqlJs({
-        locateFile: (file) => `https://sql.js.org/dist/${file}`
-      });
+      // Priority order: IndexedDB > File System > localStorage
+      const storageOrder: StorageType[] = preferredStorage 
+        ? [preferredStorage, 'indexedDB', 'fileSystem', 'localStorage']
+        : ['indexedDB', 'fileSystem', 'localStorage'];
 
-      // Check for saved directory handle
-      if (StorageManager.isFileSystemAccessSupported() && preferredStorage !== 'localStorage') {
-        await this.tryRestoreDirectoryHandle();
+      for (const storageType of storageOrder) {
+        try {
+          if (await this.tryInitializeStorage(storageType)) {
+            this.currentStorage = storageType;
+            this.initialized = true;
+            console.log(`✅ Storage initialized with ${this.currentStorage} backend`);
+            return;
+          }
+        } catch (error) {
+          console.warn(`Failed to initialize ${storageType}:`, error);
+          continue;
+        }
       }
 
-      // Initialize database
-      if (this.dirHandle) {
-        await this.initializeSQLiteFromFile();
-        this.currentStorage = 'fileSystem';
-      } else {
-        await this.initializeSQLiteInMemory();
-        this.currentStorage = 'localStorage';
-      }
-
-      this.initialized = true;
-      console.log(`✅ Storage initialized with ${this.currentStorage} backend`);
+      throw new Error('All storage methods failed');
     } catch (error) {
-      console.error('❌ Failed to initialize storage:', error);
-      // Fallback to localStorage
+      console.error('❌ Failed to initialize any storage method:', error);
+      // Ultimate fallback to localStorage without IndexedDB
       this.currentStorage = 'localStorage';
       this.initialized = true;
+    }
+  }
+
+  /**
+   * Try to initialize a specific storage type
+   */
+  private async tryInitializeStorage(storageType: StorageType): Promise<boolean> {
+    switch (storageType) {
+      case 'indexedDB':
+        await indexedDBManager.initialize();
+        return true;
+
+      case 'fileSystem':
+        if (!StorageManager.isFileSystemAccessSupported()) {
+          return false;
+        }
+        await this.tryRestoreDirectoryHandle();
+        if (this.dirHandle) {
+          // Initialize SQL.js for file system storage
+          this.sql = await initSqlJs({
+            locateFile: (file) => `https://sql.js.org/dist/${file}`
+          });
+          await this.initializeSQLiteFromFile();
+          return true;
+        }
+        return false;
+
+      case 'localStorage':
+        // Initialize SQL.js for localStorage backup
+        this.sql = await initSqlJs({
+          locateFile: (file) => `https://sql.js.org/dist/${file}`
+        });
+        await this.initializeSQLiteInMemory();
+        return true;
+
+      default:
+        return false;
     }
   }
 
@@ -156,16 +193,36 @@ export class StorageManager {
     location: string;
     size: string;
     available: boolean;
+    quota?: StorageQuota;
   }> {
     const info = {
       type: this.currentStorage,
       location: '',
       size: '0 KB',
-      available: true
+      available: true,
+      quota: undefined as StorageQuota | undefined
     };
 
     try {
-      if (this.currentStorage === 'fileSystem' && this.dirHandle) {
+      if (this.currentStorage === 'indexedDB') {
+        info.location = 'Browser IndexedDB';
+        const quota = await indexedDBManager.getStorageQuota();
+        info.quota = quota;
+        
+        if (quota.quota > 0) {
+          const usedGB = quota.usage / (1024 * 1024 * 1024);
+          const quotaGB = quota.quota / (1024 * 1024 * 1024);
+          
+          if (usedGB < 1) {
+            info.size = `${(quota.usage / (1024 * 1024)).toFixed(2)} MB of ${quotaGB.toFixed(1)} GB (${quota.percentage.toFixed(1)}%)`;
+          } else {
+            info.size = `${usedGB.toFixed(2)} GB of ${quotaGB.toFixed(1)} GB (${quota.percentage.toFixed(1)}%)`;
+          }
+        } else {
+          info.size = 'Quota unavailable';
+        }
+        
+      } else if (this.currentStorage === 'fileSystem' && this.dirHandle) {
         info.location = this.dirHandle.name;
         // Try to estimate size by database file
         try {
@@ -184,7 +241,7 @@ export class StorageManager {
             totalSize += localStorage[key].length;
           }
         }
-        info.size = `${(totalSize / 1024).toFixed(2)} KB`;
+        info.size = `${(totalSize / 1024).toFixed(2)} KB of ~5-10MB (${((totalSize / (5 * 1024 * 1024)) * 100).toFixed(1)}%)`;
       }
     } catch (error) {
       console.error('Error getting storage info:', error);

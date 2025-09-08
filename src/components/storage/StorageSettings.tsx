@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { storageManager, StorageManager, StorageType } from '../../utils/storage/StorageManager';
+import { StorageQuota } from '../../utils/storage/IndexedDBManager';
 import './StorageSettings.css';
 
 interface StorageInfo {
@@ -7,6 +8,7 @@ interface StorageInfo {
   location: string;
   size: string;
   available: boolean;
+  quota?: StorageQuota;
 }
 
 interface StorageSettingsProps {
@@ -177,8 +179,8 @@ const StorageSettings: React.FC<StorageSettingsProps> = ({ isOpen, onClose }) =>
                     <span className="info-label">Type:</span>
                     <span className="info-value">
                       {storageInfo.type === 'fileSystem' ? '📁 File System' : 
-                       storageInfo.type === 'localStorage' ? '🌐 Browser Storage' : 
-                       '💾 IndexedDB'}
+                       storageInfo.type === 'localStorage' ? '🌐 Browser Storage (Legacy)' : 
+                       '💾 IndexedDB (Recommended)'}
                     </span>
                   </div>
                   <div className="info-item">
@@ -197,15 +199,41 @@ const StorageSettings: React.FC<StorageSettingsProps> = ({ isOpen, onClose }) =>
                   </div>
                 </div>
                 
+                {/* IndexedDB benefits info */}
+                {storageInfo.type === 'indexedDB' && (
+                  <div className="indexeddb-info">
+                    <div className="storage-badge indexeddb-badge">💾 IndexedDB Active</div>
+                    <p>
+                      <strong>🚀 Powerful Storage Enabled!</strong><br/>
+                      IndexedDB provides {storageInfo.quota ? `${(storageInfo.quota.quota / (1024**3)).toFixed(0)}GB` : 'massive'} storage capacity - 
+                      thousands of times more than basic browser storage. Perfect for AI conversations, 
+                      large todo lists, and extensive productivity data.
+                    </p>
+                    {storageInfo.quota && storageInfo.quota.quota > 0 && (
+                      <div className="quota-visual">
+                        <div className="quota-bar">
+                          <div 
+                            className="quota-used" 
+                            style={{ width: `${Math.min(storageInfo.quota.percentage, 100)}%` }}
+                          ></div>
+                        </div>
+                        <div className="quota-text">
+                          Using {(storageInfo.quota.usage / (1024**2)).toFixed(1)}MB of {(storageInfo.quota.quota / (1024**3)).toFixed(1)}GB 
+                          ({storageInfo.quota.percentage.toFixed(1)}% used)
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Mobile-specific info */}
                 {isMobile() && storageInfo.type === 'localStorage' && (
                   <div className="mobile-storage-info">
-                    <div className="mobile-badge">📱 Mobile Optimized</div>
+                    <div className="mobile-badge">📱 Mobile Storage</div>
                     <p>
-                      <strong>✅ Your data is being saved!</strong><br/>
-                      On mobile devices, your data is stored in secure browser storage and automatically 
-                      syncs when you use the PWA. Your countdown settings, todos, and other data persist 
-                      across app sessions.
+                      <strong>⚠️ Limited Storage Active</strong><br/>
+                      You're using legacy localStorage (5MB limit). Your data is saved but capacity is limited. 
+                      Try refreshing the page - the app will automatically upgrade to IndexedDB for much more storage space.
                     </p>
                   </div>
                 )}
