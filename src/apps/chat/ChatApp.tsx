@@ -181,9 +181,7 @@ const ChatApp: React.FC = () => {
               });
             }
           },
-          device: 'auto',
-          quantized: true,
-          revision: 'main'
+          quantized: true
         }),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000)
@@ -231,30 +229,49 @@ const ChatApp: React.FC = () => {
       await chatStorage.addMessage(userMessageObj);
       setMessages(prev => [...prev, { ...userMessageObj, id: Date.now() }]);
 
-      // Build context from recent messages
-      const recentMessages = messages.slice(-5); // Last 5 messages for context
-      let prompt = '';
-      
-      for (const msg of recentMessages) {
-        prompt += `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}\n`;
-      }
-      prompt += `Human: ${userMessage}\nAssistant:`;
+      let response = '';
 
-      // Generate response
-      const result = await pipelineRef.current(prompt, {
-        max_new_tokens: 100,
-        temperature: 0.7,
-        do_sample: true,
-        pad_token_id: pipelineRef.current.tokenizer.eos_token_id,
-        num_return_sequences: 1
-      });
+      // Handle test mode
+      if (pipelineRef.current === 'test-mode') {
+        // Simulate thinking time
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+        
+        // Generate test responses
+        const testResponses = [
+          `I understand you said: "${userMessage}". This is a test response from the AI chat system.`,
+          `That's an interesting point about "${userMessage}". In test mode, I can help you explore the chat interface.`,
+          `Thank you for sharing "${userMessage}". The AI chat feature is working correctly in test mode.`,
+          `I hear you mentioning "${userMessage}". This demonstrates the chat functionality without requiring large AI models.`,
+          `Regarding "${userMessage}" - the test mode allows you to experience the chat interface while we work on model loading.`
+        ];
+        
+        response = testResponses[Math.floor(Math.random() * testResponses.length)];
+      } else {
+        // Build context from recent messages
+        const recentMessages = messages.slice(-5); // Last 5 messages for context
+        let prompt = '';
+        
+        for (const msg of recentMessages) {
+          prompt += `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}\n`;
+        }
+        prompt += `Human: ${userMessage}\nAssistant:`;
 
-      let response = result[0].generated_text;
-      
-      // Extract only the assistant's response (after the last "Assistant:")
-      const assistantIndex = response.lastIndexOf('Assistant:');
-      if (assistantIndex !== -1) {
-        response = response.substring(assistantIndex + 'Assistant:'.length).trim();
+        // Generate response using AI model
+        const result = await pipelineRef.current(prompt, {
+          max_new_tokens: 100,
+          temperature: 0.7,
+          do_sample: true,
+          pad_token_id: pipelineRef.current.tokenizer?.eos_token_id,
+          num_return_sequences: 1
+        });
+
+        response = result[0].generated_text;
+        
+        // Extract only the assistant's response (after the last "Assistant:")
+        const assistantIndex = response.lastIndexOf('Assistant:');
+        if (assistantIndex !== -1) {
+          response = response.substring(assistantIndex + 'Assistant:'.length).trim();
+        }
       }
 
       // Clean up response
@@ -270,7 +287,7 @@ const ChatApp: React.FC = () => {
         timestamp: new Date().toISOString(),
         conversation_id: currentConversationId,
         model: selectedModel.id,
-        tokens_used: result[0].generated_text.length // Rough token estimate
+        tokens_used: response.length // Rough token estimate
       };
 
       await chatStorage.addMessage(assistantMessageObj);

@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import StorageSettings from './storage/StorageSettings';
 import './Homepage.css';
 
+// Import package.json to get version
+const packageInfo = require('../../package.json');
+
 const Homepage: React.FC = () => {
   const [showStorageSettings, setShowStorageSettings] = useState(false);
 
@@ -77,6 +80,10 @@ const Homepage: React.FC = () => {
         <div className="footer-info">
           <p>🚀 Built with React + TypeScript • SQLite Storage • Local AI • Deployed on GitHub Pages</p>
           <p>📱 Mobile-optimized • PWA-ready • File System Support</p>
+          <div className="version-info">
+            <span className="version-badge">v{packageInfo.version}</span>
+            <span className="build-time">{new Date().toISOString().split('T')[0]}</span>
+          </div>
         </div>
       </div>
 

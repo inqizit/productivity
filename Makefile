@@ -16,7 +16,7 @@ help:
 run:
 	@echo "🚀 Starting development server..."
 	@echo "📱 App will open at http://localhost:3000"
-	@echo "🎯 Countdown app: http://localhost:3000/countdown?dob=1996-01-15&age=70"
+	@echo "🎯 Countdown app: http://localhost:3000/productivity"
 	npm start
 
 # Build and deploy to GitHub Pages
@@ -26,7 +26,7 @@ deploy:
 	@echo "🚀 Deploying to GitHub Pages..."
 	npm run deploy
 	@echo "✅ Deployment complete!"
-	@echo "🌐 Your app will be available at: https://inqizit.github.io/productivity/countdown?dob=1996-01-15&age=70"
+	@echo "🌐 Your app will be available at: https://inqizit.github.io/productivity"
 
 # Build production version only
 build:

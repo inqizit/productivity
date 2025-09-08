@@ -2,8 +2,7 @@
 .countdown-app {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   padding: 2rem;
   background: #f8f9fa;
 }
@@ -14,6 +13,9 @@
   gap: 1.5rem;
   max-width: 600px;
   width: 100%;
+  margin: 0 auto;
+  flex: 1;
+  justify-content: center;
 }
 
 /* Days highlight - most important metric */
@@ -325,19 +327,24 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .setup-form {
   background: white;
   border-radius: 20px;
   padding: 2rem;
-  max-width: 400px;
+  max-width: 500px;
   width: 100%;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  margin: auto;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
 }
 
 .setup-form h2 {
@@ -612,6 +619,231 @@
   color: white;
 }
 
+/* Countdown Tabs */
+.countdown-tabs {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e9ecef;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.countdown-tab {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  top: 2px;
+}
+
+.countdown-tab:hover {
+  background: #f8f9fa;
+  border-color: #667eea;
+}
+
+.countdown-tab.active {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+  border-color: #3b82f6;
+  box-shadow: 0 -4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.tab-content {
+  flex: 1;
+  text-align: left;
+}
+
+.tab-title {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-description {
+  font-size: 0.8rem;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tab-edit, .tab-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.tab-edit:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.tab-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.add-tab {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  min-width: 60px;
+  flex-shrink: 0;
+  position: relative;
+  top: 2px;
+}
+
+.add-tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* No countdowns state */
+.no-countdowns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 2rem;
+}
+
+.no-countdowns-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.no-countdowns-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.no-countdowns-content h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.no-countdowns-content p {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Enhanced setup form for new fields */
+.setup-button.secondary {
+  background: #6c757d;
+  margin-top: 0.5rem;
+}
+
+.setup-button.secondary:hover {
+  background: #5a6268;
+}
+
+/* Mobile responsive tabs */
+@media (max-width: 768px) {
+  .countdown-tab {
+    min-width: 150px;
+    padding: 0.8rem 1rem;
+  }
+  
+  .tab-title {
+    font-size: 0.9rem;
+  }
+  
+  .tab-description {
+    font-size: 0.75rem;
+  }
+  
+  .add-tab {
+    min-width: 50px;
+    padding: 0.8rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .countdown-tab {
+    min-width: 120px;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .tab-actions {
+    gap: 0.3rem;
+  }
+  
+  .tab-edit, .tab-delete {
+    padding: 0.2rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Version display */
+.app-version {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(102, 126, 234, 0.9);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.app-version:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
 /* PWA Detection Badge */
 @media (display-mode: standalone) {
   .countdown-app::before {
@@ -625,5 +857,11 @@
     border-radius: 15px;
     font-size: 0.8rem;
     z-index: 999;
+  }
+  
+  /* Adjust version position when PWA badge is shown */
+  .app-version {
+    bottom: 1rem;
+    right: 1rem;
   }
 }

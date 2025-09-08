@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './CountdownApp.css';
 
-// Import package.json to get version
-const packageInfo = require('../../../package.json');
-
 interface CountdownResults {
   daysLeft: string;
   hoursLeft: string;
@@ -22,7 +19,6 @@ interface CountdownInstance {
   title: string;
   description?: string;
   startDate: string;
-  startTime?: string; // HH:MM format for time precision
   endDate: string;
   endTime?: string; // HH:MM format for time precision
   showRealisticTime?: boolean;
@@ -69,7 +65,6 @@ const CountdownApp: React.FC = () => {
   const [formTitle, setFormTitle] = useState<string>('');
   const [formDescription, setFormDescription] = useState<string>('');
   const [formStartDate, setFormStartDate] = useState<string>('');
-  const [formStartTime, setFormStartTime] = useState<string>('00:00');
   const [formEndDate, setFormEndDate] = useState<string>('');
   const [formEndTime, setFormEndTime] = useState<string>('23:59');
   const [formShowRealisticTime, setFormShowRealisticTime] = useState<boolean>(false);
@@ -116,22 +111,16 @@ const CountdownApp: React.FC = () => {
 
     setError('');
 
-         try {
-       const now = new Date();
-       
-       // Combine start date with start time
-       let start = new Date(currentInstance.startDate);
-       if (currentInstance.startTime) {
-         const [hours, minutes] = currentInstance.startTime.split(':').map(Number);
-         start.setHours(hours, minutes, 0, 0);
-       }
-       
-       // Combine end date with end time
-       let end = new Date(currentInstance.endDate);
-       if (currentInstance.endTime) {
-         const [hours, minutes] = currentInstance.endTime.split(':').map(Number);
-         end.setHours(hours, minutes, 0, 0);
-       }
+    try {
+      const now = new Date();
+      const start = new Date(currentInstance.startDate);
+      
+      // Combine end date with end time
+      let end = new Date(currentInstance.endDate);
+      if (currentInstance.endTime) {
+        const [hours, minutes] = currentInstance.endTime.split(':').map(Number);
+        end.setHours(hours, minutes, 0, 0);
+      }
 
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
         setError('⚠️ Invalid date format. Please check your dates.');
@@ -170,16 +159,13 @@ const CountdownApp: React.FC = () => {
       const timeElapsedDays = Math.floor(timeElapsedMs / (1000 * 60 * 60 * 24));
       const totalDurationDays = Math.floor(totalTime / (1000 * 60 * 60 * 24));
 
-      // Calculate productive/realistic time based on ratios
+      // Calculate productive/realistic time
       let productiveResults: Partial<CountdownResults> = {};
       if (currentInstance.showRealisticTime) {
         const availableHoursPerDay = 24 - (currentInstance.dailyUnavailableHours || 15);
-        const productiveRatio = availableHoursPerDay / 24; // e.g., 9/24 = 0.375
-        
-        // Apply the ratio to total remaining time
-        const productiveTotalHours = totalHoursLeft * productiveRatio;
-        const productiveTotalMinutes = totalMinutesLeft * productiveRatio;
-        const productiveTotalSeconds = totalSecondsLeft * productiveRatio;
+        const productiveTotalHours = totalDaysLeft * availableHoursPerDay;
+        const productiveTotalMinutes = productiveTotalHours * 60;
+        const productiveTotalSeconds = productiveTotalMinutes * 60;
 
         productiveResults = {
           productiveHoursLeft: Math.floor(productiveTotalHours).toLocaleString(),
@@ -283,17 +269,16 @@ const CountdownApp: React.FC = () => {
   // Handle setup form submission
   const handleSetupSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-         if (formTitle && formStartDate && formEndDate) {
-       const instanceData = {
-         title: formTitle,
-         description: formDescription || undefined,
-         startDate: formStartDate,
-         startTime: formStartTime,
-         endDate: formEndDate,
-         endTime: formEndTime,
-         showRealisticTime: formShowRealisticTime,
-         dailyUnavailableHours: formDailyUnavailableHours
-       };
+    if (formTitle && formStartDate && formEndDate) {
+      const instanceData = {
+        title: formTitle,
+        description: formDescription || undefined,
+        startDate: formStartDate,
+        endDate: formEndDate,
+        endTime: formEndTime,
+        showRealisticTime: formShowRealisticTime,
+        dailyUnavailableHours: formDailyUnavailableHours
+      };
 
       if (editingInstanceId) {
         updateInstance(editingInstanceId, instanceData);
@@ -312,7 +297,6 @@ const CountdownApp: React.FC = () => {
     setFormTitle('');
     setFormDescription('');
     setFormStartDate('');
-    setFormStartTime('00:00');
     setFormEndDate('');
     setFormEndTime('23:59');
     setFormShowRealisticTime(false);
@@ -325,7 +309,6 @@ const CountdownApp: React.FC = () => {
     setFormTitle(instance.title);
     setFormDescription(instance.description || '');
     setFormStartDate(instance.startDate);
-    setFormStartTime(instance.startTime || '00:00');
     setFormEndDate(instance.endDate);
     setFormEndTime(instance.endTime || '23:59');
     setFormShowRealisticTime(instance.showRealisticTime || false);
@@ -393,28 +376,18 @@ const CountdownApp: React.FC = () => {
               </div>
 
               <div className="setup-field">
-                 <label htmlFor="startDate">Start Date *</label>
-                 <input
-                   id="startDate"
-                   type="date"
-                   value={formStartDate}
-                   onChange={(e) => setFormStartDate(e.target.value)}
-                   required
-                 />
-               </div>
+                <label htmlFor="startDate">Start Date *</label>
+                <input
+                  id="startDate"
+                  type="date"
+                  value={formStartDate}
+                  onChange={(e) => setFormStartDate(e.target.value)}
+                  required
+                />
+              </div>
 
-               <div className="setup-field">
-                 <label htmlFor="startTime">Start Time</label>
-                 <input
-                   id="startTime"
-                   type="time"
-                   value={formStartTime}
-                   onChange={(e) => setFormStartTime(e.target.value)}
-                 />
-               </div>
-
-               <div className="setup-field">
-                 <label htmlFor="endDate">End Date *</label>
+              <div className="setup-field">
+                <label htmlFor="endDate">End Date *</label>
                 <input
                   id="endDate"
                   type="date"
@@ -623,13 +596,9 @@ const CountdownApp: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Version display */}
-      <div className="app-version">
-        v{packageInfo.version}
-      </div>
     </div>
   );
 };
 
 export default CountdownApp;
+
