@@ -25,23 +25,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const savedThemeId = localStorage.getItem('productivity-app-theme');
     const savedCustomThemes = localStorage.getItem('productivity-app-custom-themes');
     
+    let loadedCustomThemes: ThemeConfig[] = [];
     if (savedCustomThemes) {
       try {
-        const parsed = JSON.parse(savedCustomThemes);
-        setCustomThemes(parsed);
+        loadedCustomThemes = JSON.parse(savedCustomThemes);
+        setCustomThemes(loadedCustomThemes);
       } catch (error) {
         console.error('Failed to parse custom themes:', error);
       }
     }
 
     if (savedThemeId) {
-      const allThemes = [...defaultThemes, ...customThemes];
+      const allThemes = [...defaultThemes, ...loadedCustomThemes];
       const theme = allThemes.find(t => t.id === savedThemeId);
       if (theme) {
         setCurrentTheme(theme);
       }
     }
-  }, [customThemes]); // Include customThemes as dependency
+  }, []); // Remove dependency to avoid infinite loop
 
   // Apply theme CSS variables when theme changes
   useEffect(() => {
@@ -65,6 +66,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     root.style.setProperty('--color-warning', colors.warning);
     root.style.setProperty('--color-error', colors.error);
     root.style.setProperty('--color-info', colors.info);
+
+    // Apply background gradient directly to body and app containers
+    const appElements = document.querySelectorAll('.homepage, .exercise-app, .schedule-app, .countdown-app, .todo-app, .pomodoro-app, .chat-app');
+    appElements.forEach(element => {
+      (element as HTMLElement).style.background = colors.background;
+    });
 
     // Save current theme
     localStorage.setItem('productivity-app-theme', currentTheme.id);

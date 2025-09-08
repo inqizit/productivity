@@ -220,6 +220,7 @@
 /* Theme System Integration */
 .homepage {
   background: var(--color-background) !important;
+  transition: background 0.5s ease !important;
 }
 
 .app-card {

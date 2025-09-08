@@ -29,7 +29,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Dark/themed variant */
+/* Themed variant - uses theme colors */
 .back-button.themed {
     background: var(--color-surface);
     color: var(--color-text);
@@ -44,6 +44,21 @@
     transform: translateY(-2px);
 }
 
+/* Theme-aware default variant - adapts to theme background */
+.back-button:not(.themed):not(.fixed) {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: white;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.back-button:not(.themed):not(.fixed):hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
 /* Fixed position variant for floating back button */
 .back-button.fixed {
     position: fixed;
@@ -55,11 +70,13 @@
     border: 2px solid var(--color-border);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     margin: 0;
+    backdrop-filter: blur(15px);
 }
 
 .back-button.fixed:hover {
     background: var(--color-surface-secondary);
     border-color: var(--color-primary);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Compact variant */

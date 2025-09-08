@@ -368,8 +368,18 @@ const CountdownApp: React.FC = () => {
       {showSetup && (
         <div className="setup-overlay">
           <div className="setup-form">
-            <h2>{editingInstanceId ? 'Edit Countdown' : 'Create New Countdown'}</h2>
-            <p>Set up your countdown with start and end dates</p>
+            <div className="setup-form-header">
+              <BackButton 
+                className="compact themed" 
+                onClick={() => setShowSetup(false)}
+              >
+                ← Close
+              </BackButton>
+              <div>
+                <h2>{editingInstanceId ? 'Edit Countdown' : 'Create New Countdown'}</h2>
+                <p>Set up your countdown with start and end dates</p>
+              </div>
+            </div>
 
             <form onSubmit={handleSetupSubmit}>
               <div className="setup-field">

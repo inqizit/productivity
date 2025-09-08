@@ -4,7 +4,8 @@
   display: flex;
   flex-direction: column;
   padding: 2rem;
-  background: #f8f9fa;
+  background: var(--color-background);
+  transition: background 0.5s ease;
 }
 
 .countdown-container {
@@ -221,12 +222,12 @@
   .countdown-app {
     padding: 1rem;
   }
-  
+
   .countdown-container {
     gap: 1.5rem;
     max-width: 100%;
   }
-  
+
   .countdown-item {
     padding: 1.5rem 1rem;
   }
@@ -241,23 +242,23 @@
     min-width: auto;
     width: 100%;
   }
-  
+
   .countdown-number {
     font-size: 2.2rem;
   }
-  
+
   .countdown-label {
     font-size: 0.9rem;
   }
-  
+
   .progress-text {
     font-size: 1.2rem;
   }
-  
+
   .progress-top .progress-text {
     font-size: 1.4rem;
   }
-  
+
   .progress-info {
     font-size: 0.8rem;
   }
@@ -274,7 +275,7 @@
     gap: 1rem;
     max-width: 100%;
   }
-  
+
   .countdown-item {
     padding: 1.2rem 0.8rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -285,16 +286,16 @@
     flex-direction: column;
     gap: 0.8rem;
   }
-  
+
   .countdown-number {
     font-size: 1.8rem;
     margin-bottom: 0.3rem;
   }
-  
+
   .countdown-label {
     font-size: 0.8rem;
   }
-  
+
   .progress-text {
     font-size: 1rem;
   }
@@ -312,7 +313,7 @@
   .progress-top .progress-text {
     font-size: 1.2rem;
   }
-  
+
   .progress-info {
     font-size: 0.75rem;
   }
@@ -431,8 +432,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-message p {
@@ -589,7 +595,8 @@
 }
 
 /* PWA Controls */
-.setup-link, .change-settings {
+.setup-link,
+.change-settings {
   background: #28a745;
   color: white;
   border: none;
@@ -602,7 +609,8 @@
   margin-top: 1rem;
 }
 
-.setup-link:hover, .change-settings:hover {
+.setup-link:hover,
+.change-settings:hover {
   background: #218838;
   transform: translateY(-1px);
 }
@@ -700,7 +708,8 @@
   align-items: center;
 }
 
-.tab-edit, .tab-delete {
+.tab-edit,
+.tab-delete {
   background: none;
   border: none;
   cursor: pointer;
@@ -786,15 +795,15 @@
     min-width: 150px;
     padding: 0.8rem 1rem;
   }
-  
+
   .tab-title {
     font-size: 0.9rem;
   }
-  
+
   .tab-description {
     font-size: 0.75rem;
   }
-  
+
   .add-tab {
     min-width: 50px;
     padding: 0.8rem 1rem;
@@ -806,12 +815,13 @@
     min-width: 120px;
     padding: 0.6rem 0.8rem;
   }
-  
+
   .tab-actions {
     gap: 0.3rem;
   }
-  
-  .tab-edit, .tab-delete {
+
+  .tab-edit,
+  .tab-delete {
     padding: 0.2rem;
     font-size: 0.8rem;
   }
@@ -858,10 +868,27 @@
     font-size: 0.8rem;
     z-index: 999;
   }
-  
+
   /* Adjust version position when PWA badge is shown */
   .app-version {
     bottom: 1rem;
     right: 1rem;
   }
+}
+
+/* Setup Form Header Styles */
+.setup-form-header {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.setup-form-header .back-button {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.setup-form-header>div {
+  flex: 1;
 }

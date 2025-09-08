@@ -39,12 +39,24 @@
 
 /* Global themed classes */
 .themed-bg-primary {
-    background: var(--color-primary) !important;
-    color: white !important;
+  background: var(--color-primary) !important;
+  color: white !important;
 }
 
 .themed-bg-gradient {
-    background: var(--color-background) !important;
+  background: var(--color-background) !important;
+}
+
+/* Force gradient application on theme containers */
+.homepage,
+.exercise-app,
+.schedule-app,
+.countdown-app,
+.todo-app,
+.pomodoro-app,
+.chat-app,
+.theme-settings {
+  background: var(--color-background) !important;
 }
 
 .themed-bg-surface {

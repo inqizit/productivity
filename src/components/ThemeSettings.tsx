@@ -113,6 +113,27 @@ const ThemeSettings: React.FC = () => {
                             <div className="theme-option-info">
                                 <h5>{theme.name}</h5>
                                 <p>{theme.description}</p>
+                                {!theme.isCustom && (
+                                    <div className="theme-details">
+                                        <div className="color-chips">
+                                            <div
+                                                className="color-chip"
+                                                style={{ background: theme.colors.primary }}
+                                                title="Primary Color"
+                                            ></div>
+                                            <div
+                                                className="color-chip"
+                                                style={{ background: theme.colors.secondary }}
+                                                title="Secondary Color"
+                                            ></div>
+                                            <div
+                                                className="color-chip"
+                                                style={{ background: theme.colors.success }}
+                                                title="Success Color"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                )}
                                 {theme.isCustom && (
                                     <span className="custom-badge">Custom</span>
                                 )}
