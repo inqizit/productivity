@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import BackButton from '../../components/BackButton';
 import './PomodoroApp.css';
 
 interface PomodoroSettings {
@@ -96,7 +97,7 @@ const PomodoroApp: React.FC = () => {
       }
 
       const audioContext = audioContextRef.current;
-      
+
       // Create a simple beep sound
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -142,7 +143,7 @@ const PomodoroApp: React.FC = () => {
         // Timer completed
         setTimerState('completed');
         playNotificationSound();
-        
+
         // Add completed session to history
         const completedSession: PomodoroSession = {
           id: Date.now(),
@@ -162,7 +163,7 @@ const PomodoroApp: React.FC = () => {
         if (currentSessionType === 'work') {
           const newSessionCount = sessionCount + 1;
           setSessionCount(newSessionCount);
-          
+
           if (newSessionCount % settings.sessionsUntilLongBreak === 0) {
             nextSessionType = 'longBreak';
           } else {
@@ -173,7 +174,7 @@ const PomodoroApp: React.FC = () => {
         }
 
         // Auto-start next session if enabled
-        const shouldAutoStart = 
+        const shouldAutoStart =
           (nextSessionType !== 'work' && settings.autoStartBreaks) ||
           (nextSessionType === 'work' && settings.autoStartWork);
 
@@ -225,12 +226,12 @@ const PomodoroApp: React.FC = () => {
 
   const skipSession = (): void => {
     setTimerState('idle');
-    
+
     let nextSessionType: SessionType;
     if (currentSessionType === 'work') {
       const newSessionCount = sessionCount + 1;
       setSessionCount(newSessionCount);
-      
+
       if (newSessionCount % settings.sessionsUntilLongBreak === 0) {
         nextSessionType = 'longBreak';
       } else {
@@ -261,7 +262,7 @@ const PomodoroApp: React.FC = () => {
   const updateSettings = (newSettings: PomodoroSettings): void => {
     setSettings(newSettings);
     saveSettings(newSettings);
-    
+
     // Reset timer if idle
     if (timerState === 'idle') {
       setTimeLeft(getSessionDuration(currentSessionType) * 60);
@@ -292,6 +293,7 @@ const PomodoroApp: React.FC = () => {
 
   return (
     <div className="pomodoro-app">
+      <BackButton />
       <div className="pomodoro-container">
         <div className="pomodoro-header">
           <h1>⏱️ Pomodoro Timer</h1>
@@ -305,18 +307,18 @@ const PomodoroApp: React.FC = () => {
           </div>
 
           <div className="timer-display">
-            <div 
-              className="timer-circle" 
-              style={{ 
-                background: `conic-gradient(${sessionInfo.color} ${getProgress()}%, #f0f0f0 ${getProgress()}%)` 
+            <div
+              className="timer-circle"
+              style={{
+                background: `conic-gradient(${sessionInfo.color} ${getProgress()}%, #f0f0f0 ${getProgress()}%)`
               }}
             >
               <div className="timer-inner">
                 <div className="time-display">{formatTime(timeLeft)}</div>
                 <div className="time-label">
-                  {timerState === 'running' ? 'Running' : 
-                   timerState === 'paused' ? 'Paused' : 
-                   timerState === 'completed' ? 'Completed!' : 'Ready'}
+                  {timerState === 'running' ? 'Running' :
+                    timerState === 'paused' ? 'Paused' :
+                      timerState === 'completed' ? 'Completed!' : 'Ready'}
                 </div>
               </div>
             </div>
@@ -336,11 +338,11 @@ const PomodoroApp: React.FC = () => {
                 ▶️ Resume
               </button>
             )}
-            
+
             <button className="control-button reset" onClick={resetTimer}>
               🔄 Reset
             </button>
-            
+
             <button className="control-button skip" onClick={skipSession}>
               ⏭️ Skip
             </button>
@@ -367,16 +369,16 @@ const PomodoroApp: React.FC = () => {
         </div>
 
         <div className="action-buttons">
-          <button 
-            className="action-button settings" 
+          <button
+            className="action-button settings"
             onClick={() => setShowSettings(true)}
           >
             ⚙️ Settings
           </button>
-          
+
           {sessions.length > 0 && (
-            <button 
-              className="action-button clear" 
+            <button
+              className="action-button clear"
               onClick={clearAllSessions}
             >
               🧹 Clear History
@@ -391,8 +393,8 @@ const PomodoroApp: React.FC = () => {
               {sessions.slice(0, 5).map(session => (
                 <div key={session.id} className="session-item">
                   <span className="session-type-indicator">
-                    {session.type === 'work' ? '💼' : 
-                     session.type === 'shortBreak' ? '☕' : '🏖️'}
+                    {session.type === 'work' ? '💼' :
+                      session.type === 'shortBreak' ? '☕' : '🏖️'}
                   </span>
                   <span className="session-duration">{session.duration}m</span>
                   <span className="session-time">
@@ -406,7 +408,7 @@ const PomodoroApp: React.FC = () => {
       </div>
 
       {showSettings && (
-        <SettingsModal 
+        <SettingsModal
           settings={settings}
           onSave={updateSettings}
           onClose={() => setShowSettings(false)}

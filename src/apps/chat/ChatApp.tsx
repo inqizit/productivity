@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { pipeline, PipelineType } from '@xenova/transformers';
+import BackButton from '../../components/BackButton';
 import { chatStorage, ChatMessage, ChatConversation } from '../../utils/storage/AppStorage';
 import './ChatApp.css';
 
@@ -31,7 +32,7 @@ const AVAILABLE_MODELS: ModelInfo[] = [
   },
   {
     id: 'gpt2-tiny',
-    name: 'GPT-2 Nano', 
+    name: 'GPT-2 Nano',
     size: '~80MB',
     description: 'Small but capable text generation',
     type: 'text-generation' as PipelineType,
@@ -108,7 +109,7 @@ const ChatApp: React.FC = () => {
     try {
       const title = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
       const conversationId = await chatStorage.createConversation(title);
-      
+
       await loadConversations();
       setCurrentConversationId(conversationId);
       setMessages([]);
@@ -124,7 +125,7 @@ const ChatApp: React.FC = () => {
     try {
       await chatStorage.deleteConversation(conversationId);
       await loadConversations();
-      
+
       if (currentConversationId === conversationId) {
         setCurrentConversationId(null);
         setMessages([]);
@@ -183,7 +184,7 @@ const ChatApp: React.FC = () => {
           },
           quantized: true
         }),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000)
         )
       ]);
@@ -235,7 +236,7 @@ const ChatApp: React.FC = () => {
       if (pipelineRef.current === 'test-mode') {
         // Simulate thinking time
         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-        
+
         // Generate test responses
         const testResponses = [
           `I understand you said: "${userMessage}". This is a test response from the AI chat system.`,
@@ -244,13 +245,13 @@ const ChatApp: React.FC = () => {
           `I hear you mentioning "${userMessage}". This demonstrates the chat functionality without requiring large AI models.`,
           `Regarding "${userMessage}" - the test mode allows you to experience the chat interface while we work on model loading.`
         ];
-        
+
         response = testResponses[Math.floor(Math.random() * testResponses.length)];
       } else {
         // Build context from recent messages
         const recentMessages = messages.slice(-5); // Last 5 messages for context
         let prompt = '';
-        
+
         for (const msg of recentMessages) {
           prompt += `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}\n`;
         }
@@ -266,7 +267,7 @@ const ChatApp: React.FC = () => {
         });
 
         response = result[0].generated_text;
-        
+
         // Extract only the assistant's response (after the last "Assistant:")
         const assistantIndex = response.lastIndexOf('Assistant:');
         if (assistantIndex !== -1) {
@@ -338,6 +339,7 @@ const ChatApp: React.FC = () => {
   if (!isInitialized) {
     return (
       <div className="chat-app">
+        <BackButton />
         <div className="chat-loading">
           <div className="loading-spinner">🤖</div>
           <p>Initializing chat storage...</p>
@@ -348,11 +350,12 @@ const ChatApp: React.FC = () => {
 
   return (
     <div className="chat-app">
+      <BackButton />
       <div className="chat-container">
         <div className="chat-sidebar">
           <div className="sidebar-header">
             <h2>💬 AI Chat</h2>
-            <button 
+            <button
               className="new-chat-button"
               onClick={createNewConversation}
               disabled={chatState === 'loading_model' || chatState === 'generating'}
@@ -362,7 +365,7 @@ const ChatApp: React.FC = () => {
           </div>
 
           <div className="model-selector">
-            <button 
+            <button
               className="model-button"
               onClick={() => setShowModelSelector(!showModelSelector)}
             >
@@ -435,17 +438,17 @@ const ChatApp: React.FC = () => {
                 <h3>🤖 Load AI Model</h3>
                 <p>Selected: <strong>{selectedModel.name}</strong> ({selectedModel.size})</p>
                 <p>{selectedModel.description}</p>
-                
+
                 {chatState === 'loading_model' ? (
                   <div className="loading-progress">
                     <div className="progress-bar">
-                      <div 
-                        className="progress-fill" 
+                      <div
+                        className="progress-fill"
                         style={{ width: `${modelProgress.progress}%` }}
                       />
                     </div>
                     <p>{modelProgress.message}</p>
-                    <button 
+                    <button
                       className="abort-button"
                       onClick={abortGeneration}
                     >
@@ -453,14 +456,14 @@ const ChatApp: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <button 
+                  <button
                     className="load-model-button"
                     onClick={() => loadModel(selectedModel)}
                   >
                     📥 Load {selectedModel.name}
                   </button>
                 )}
-                
+
                 <div className="model-info-note">
                   <p><strong>Note:</strong> Models run entirely in your browser. First load will download the model files.</p>
                   <ul>
@@ -516,7 +519,7 @@ const ChatApp: React.FC = () => {
                         </div>
                       ))
                     )}
-                    
+
                     {chatState === 'generating' && (
                       <div className="message assistant generating">
                         <div className="message-header">
@@ -532,13 +535,13 @@ const ChatApp: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     <div ref={messagesEndRef} />
                   </>
                 ) : (
                   <div className="no-conversation-selected">
                     <h3>💬 Select a conversation or create a new one</h3>
-                    <button 
+                    <button
                       className="create-conversation-button"
                       onClick={createNewConversation}
                     >
@@ -563,17 +566,17 @@ const ChatApp: React.FC = () => {
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder={
-                        chatState === 'generating' 
-                          ? 'AI is thinking...' 
+                        chatState === 'generating'
+                          ? 'AI is thinking...'
                           : 'Type your message... (Enter to send, Shift+Enter for new line)'
                       }
                       disabled={chatState === 'generating'}
                       className="chat-input"
                       rows={1}
                     />
-                    
+
                     {chatState === 'generating' ? (
-                      <button 
+                      <button
                         className="chat-button abort"
                         onClick={abortGeneration}
                       >

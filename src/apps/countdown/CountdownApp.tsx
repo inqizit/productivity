@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import BackButton from '../../components/BackButton';
 import './CountdownApp.css';
 
 // Import package.json to get version
@@ -43,8 +44,8 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => (
   <div className="progress-container">
     <div className="progress-background">
-      <div 
-        className="progress-fill" 
+      <div
+        className="progress-fill"
         style={{ width: `${Math.min(progress, 100)}%` }}
       />
     </div>
@@ -59,12 +60,12 @@ const CountdownApp: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [showSetup, setShowSetup] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   // Multiple countdown instances
   const [instances, setInstances] = useState<CountdownInstance[]>([]);
   const [activeInstanceId, setActiveInstanceId] = useState<string | null>(null);
   const [currentInstance, setCurrentInstance] = useState<CountdownInstance | null>(null);
-  
+
   // Form state for creating/editing countdowns
   const [formTitle, setFormTitle] = useState<string>('');
   const [formDescription, setFormDescription] = useState<string>('');
@@ -98,7 +99,7 @@ const CountdownApp: React.FC = () => {
       } catch (error) {
         console.error('Error loading saved instances:', error);
       }
-      
+
       // No valid saved instances found - show setup
       setShowSetup(true);
       setIsLoading(false);
@@ -116,22 +117,22 @@ const CountdownApp: React.FC = () => {
 
     setError('');
 
-         try {
-       const now = new Date();
-       
-       // Combine start date with start time
-       let start = new Date(currentInstance.startDate);
-       if (currentInstance.startTime) {
-         const [hours, minutes] = currentInstance.startTime.split(':').map(Number);
-         start.setHours(hours, minutes, 0, 0);
-       }
-       
-       // Combine end date with end time
-       let end = new Date(currentInstance.endDate);
-       if (currentInstance.endTime) {
-         const [hours, minutes] = currentInstance.endTime.split(':').map(Number);
-         end.setHours(hours, minutes, 0, 0);
-       }
+    try {
+      const now = new Date();
+
+      // Combine start date with start time
+      let start = new Date(currentInstance.startDate);
+      if (currentInstance.startTime) {
+        const [hours, minutes] = currentInstance.startTime.split(':').map(Number);
+        start.setHours(hours, minutes, 0, 0);
+      }
+
+      // Combine end date with end time
+      let end = new Date(currentInstance.endDate);
+      if (currentInstance.endTime) {
+        const [hours, minutes] = currentInstance.endTime.split(':').map(Number);
+        end.setHours(hours, minutes, 0, 0);
+      }
 
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
         setError('⚠️ Invalid date format. Please check your dates.');
@@ -175,7 +176,7 @@ const CountdownApp: React.FC = () => {
       if (currentInstance.showRealisticTime) {
         const availableHoursPerDay = 24 - (currentInstance.dailyUnavailableHours || 15);
         const productiveRatio = availableHoursPerDay / 24; // e.g., 9/24 = 0.375
-        
+
         // Apply the ratio to total remaining time
         const productiveTotalHours = totalHoursLeft * productiveRatio;
         const productiveTotalMinutes = totalMinutesLeft * productiveRatio;
@@ -208,8 +209,8 @@ const CountdownApp: React.FC = () => {
   // Save instances to localStorage
   const saveInstances = useCallback((newInstances: CountdownInstance[], activeId: string | null): void => {
     try {
-      const settings: CountdownSettings = { 
-        instances: newInstances, 
+      const settings: CountdownSettings = {
+        instances: newInstances,
         activeInstanceId: activeId
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -237,12 +238,12 @@ const CountdownApp: React.FC = () => {
 
   // Update existing instance
   const updateInstance = (instanceId: string, updates: Partial<CountdownInstance>): void => {
-    const newInstances = instances.map(instance => 
-      instance.id === instanceId 
+    const newInstances = instances.map(instance =>
+      instance.id === instanceId
         ? { ...instance, ...updates, updatedAt: new Date().toISOString() }
         : instance
     );
-    
+
     setInstances(newInstances);
     if (activeInstanceId === instanceId) {
       const updatedInstance = newInstances.find(i => i.id === instanceId);
@@ -255,7 +256,7 @@ const CountdownApp: React.FC = () => {
   const deleteInstance = (instanceId: string): void => {
     const newInstances = instances.filter(instance => instance.id !== instanceId);
     setInstances(newInstances);
-    
+
     if (activeInstanceId === instanceId) {
       const newActiveId = newInstances.length > 0 ? newInstances[0].id : null;
       setActiveInstanceId(newActiveId);
@@ -283,17 +284,17 @@ const CountdownApp: React.FC = () => {
   // Handle setup form submission
   const handleSetupSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-         if (formTitle && formStartDate && formEndDate) {
-       const instanceData = {
-         title: formTitle,
-         description: formDescription || undefined,
-         startDate: formStartDate,
-         startTime: formStartTime,
-         endDate: formEndDate,
-         endTime: formEndTime,
-         showRealisticTime: formShowRealisticTime,
-         dailyUnavailableHours: formDailyUnavailableHours
-       };
+    if (formTitle && formStartDate && formEndDate) {
+      const instanceData = {
+        title: formTitle,
+        description: formDescription || undefined,
+        startDate: formStartDate,
+        startTime: formStartTime,
+        endDate: formEndDate,
+        endTime: formEndTime,
+        showRealisticTime: formShowRealisticTime,
+        dailyUnavailableHours: formDailyUnavailableHours
+      };
 
       if (editingInstanceId) {
         updateInstance(editingInstanceId, instanceData);
@@ -351,6 +352,7 @@ const CountdownApp: React.FC = () => {
   if (isLoading) {
     return (
       <div className="countdown-app">
+        <BackButton />
         <div className="loading-message">
           <div className="loading-spinner">⏰</div>
           <p>Loading countdowns...</p>
@@ -361,13 +363,14 @@ const CountdownApp: React.FC = () => {
 
   return (
     <div className="countdown-app">
+      <BackButton />
       {/* Setup Form Modal */}
       {showSetup && (
         <div className="setup-overlay">
           <div className="setup-form">
             <h2>{editingInstanceId ? 'Edit Countdown' : 'Create New Countdown'}</h2>
             <p>Set up your countdown with start and end dates</p>
-            
+
             <form onSubmit={handleSetupSubmit}>
               <div className="setup-field">
                 <label htmlFor="title">Title *</label>
@@ -393,28 +396,28 @@ const CountdownApp: React.FC = () => {
               </div>
 
               <div className="setup-field">
-                 <label htmlFor="startDate">Start Date *</label>
-                 <input
-                   id="startDate"
-                   type="date"
-                   value={formStartDate}
-                   onChange={(e) => setFormStartDate(e.target.value)}
-                   required
-                 />
-               </div>
+                <label htmlFor="startDate">Start Date *</label>
+                <input
+                  id="startDate"
+                  type="date"
+                  value={formStartDate}
+                  onChange={(e) => setFormStartDate(e.target.value)}
+                  required
+                />
+              </div>
 
-               <div className="setup-field">
-                 <label htmlFor="startTime">Start Time</label>
-                 <input
-                   id="startTime"
-                   type="time"
-                   value={formStartTime}
-                   onChange={(e) => setFormStartTime(e.target.value)}
-                 />
-               </div>
+              <div className="setup-field">
+                <label htmlFor="startTime">Start Time</label>
+                <input
+                  id="startTime"
+                  type="time"
+                  value={formStartTime}
+                  onChange={(e) => setFormStartTime(e.target.value)}
+                />
+              </div>
 
-               <div className="setup-field">
-                 <label htmlFor="endDate">End Date *</label>
+              <div className="setup-field">
+                <label htmlFor="endDate">End Date *</label>
                 <input
                   id="endDate"
                   type="date"
@@ -437,10 +440,10 @@ const CountdownApp: React.FC = () => {
               <div className="setup-field realistic-time-section">
                 <div className="realistic-time-header">
                   <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      checked={formShowRealisticTime} 
-                      onChange={(e) => setFormShowRealisticTime(e.target.checked)} 
+                    <input
+                      type="checkbox"
+                      checked={formShowRealisticTime}
+                      onChange={(e) => setFormShowRealisticTime(e.target.checked)}
                     />
                     <span className="checkbox-text">⏱️ Show Realistic Time</span>
                   </label>
@@ -450,13 +453,13 @@ const CountdownApp: React.FC = () => {
                   <div className="realistic-time-config">
                     <label>Daily Unavailable Hours</label>
                     <div className="hours-input-group">
-                      <input 
-                        type="number" 
-                        value={formDailyUnavailableHours} 
-                        onChange={(e) => setFormDailyUnavailableHours(Number(e.target.value))} 
-                        min="8" 
-                        max="20" 
-                        step="0.5" 
+                      <input
+                        type="number"
+                        value={formDailyUnavailableHours}
+                        onChange={(e) => setFormDailyUnavailableHours(Number(e.target.value))}
+                        min="8"
+                        max="20"
+                        step="0.5"
                       />
                       <span className="hours-unit">hours/day</span>
                     </div>
@@ -472,11 +475,11 @@ const CountdownApp: React.FC = () => {
               <button type="submit" className="setup-button">
                 {editingInstanceId ? 'Update Countdown ⚙️' : 'Create Countdown ⏰'}
               </button>
-              
+
               {instances.length > 0 && (
-                <button 
-                  type="button" 
-                  className="setup-button secondary" 
+                <button
+                  type="button"
+                  className="setup-button secondary"
                   onClick={() => setShowSetup(false)}
                 >
                   Cancel
@@ -553,7 +556,7 @@ const CountdownApp: React.FC = () => {
               <span className="target-age">Total Duration: {results.totalDuration}</span>
             </div>
           </div>
-          
+
           <div className="countdown-item days-highlight">
             <div className="countdown-content">
               <div className="main-metric">
@@ -562,7 +565,7 @@ const CountdownApp: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="countdown-item">
             <div className="countdown-content">
               <div className="main-metric">
@@ -577,7 +580,7 @@ const CountdownApp: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           <div className="countdown-item">
             <div className="countdown-content">
               <div className="main-metric">
@@ -592,7 +595,7 @@ const CountdownApp: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           <div className="countdown-item">
             <div className="countdown-content">
               <div className="main-metric">

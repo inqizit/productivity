@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../themes/ThemeContext';
 import StorageSettings from './storage/StorageSettings';
 import './Homepage.css';
 
@@ -8,6 +9,7 @@ const packageInfo = require('../../package.json');
 
 const Homepage: React.FC = () => {
   const [showStorageSettings, setShowStorageSettings] = useState(false);
+  const { currentTheme } = useTheme();
 
   return (
     <div className="homepage">
@@ -16,14 +18,24 @@ const Homepage: React.FC = () => {
           <div>
             <h1 className="homepage-title">🎯 Productivity Suite</h1>
             <p className="homepage-subtitle">Collection of useful productivity apps with advanced storage</p>
+            <div className="theme-info">
+              <span className="current-theme-badge">
+                🎨 {currentTheme.name}
+              </span>
+            </div>
           </div>
-          <button 
-            className="storage-settings-button"
-            onClick={() => setShowStorageSettings(true)}
-            title="Manage your data storage"
-          >
-            💾 Storage
-          </button>
+          <div className="header-buttons">
+            <Link to="/settings/themes" className="theme-settings-button" title="Customize app themes">
+              🎨 Themes
+            </Link>
+            <button
+              className="storage-settings-button"
+              onClick={() => setShowStorageSettings(true)}
+              title="Manage your data storage"
+            >
+              💾 Storage
+            </button>
+          </div>
         </div>
 
         <div className="apps-grid">
@@ -52,6 +64,20 @@ const Homepage: React.FC = () => {
             <div className="app-icon">🤖</div>
             <h3 className="app-title">AI Chat</h3>
             <p className="app-description">Chat with local AI models running entirely in your browser. Private, fast, and offline-capable!</p>
+            <div className="app-badge">Available</div>
+          </Link>
+
+          <Link to="/exercise" className="app-card">
+            <div className="app-icon">💪</div>
+            <h3 className="app-title">Exercise Manager</h3>
+            <p className="app-description">Create and manage exercise routines with drag & drop scheduling. Includes comprehensive exercise library!</p>
+            <div className="app-badge">Available</div>
+          </Link>
+
+          <Link to="/schedule" className="app-card">
+            <div className="app-icon">📅</div>
+            <h3 className="app-title">Schedule Manager</h3>
+            <p className="app-description">Create daily schedules with 30-minute time blocks. Perfect for time management and routine planning!</p>
             <div className="app-badge">Available</div>
           </Link>
 
@@ -87,7 +113,7 @@ const Homepage: React.FC = () => {
         </div>
       </div>
 
-      <StorageSettings 
+      <StorageSettings
         isOpen={showStorageSettings}
         onClose={() => setShowStorageSettings(false)}
       />
